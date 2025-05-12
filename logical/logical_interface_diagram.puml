@@ -31,7 +31,7 @@ package "Conference Interfaces" {
     interface IConferenceData {
         + getSchedule()
         + listContentItems()
-        + getContentItem()
+        + getContentItemDetails()
         + listAuthors()
         + getRoomInfo()
     }
@@ -51,9 +51,9 @@ package "User Interfaces" {
 ' ===== Analytics Interface =====
 package "Analytics Interface" {
     interface IAnalytics {
-        + recordEvent()
-        + queryMAU()
-        + queryConferenceUsage()
+        + recordEngagementEvent()
+        + getMonthlyActiveUsers()
+        + getConferenceAccessStats()
     }
 }
 

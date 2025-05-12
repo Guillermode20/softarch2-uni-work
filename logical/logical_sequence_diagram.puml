@@ -42,7 +42,7 @@ AuthService --> APIGateway: OK (userId)
 deactivate AuthService
 
 ' Conference Metadata Flow
-APIGateway -> ConferenceMetadataService: getConferenceEndpointInfo()
+APIGateway -> ConferenceMetadataService: findConferenceEndpoint()
 activate ConferenceMetadataService
 ConferenceMetadataService --> APIGateway: EndpointInfo
 deactivate ConferenceMetadataService

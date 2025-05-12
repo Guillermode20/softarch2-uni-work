@@ -134,9 +134,9 @@ The system is a microservice-based application for managing conferences, with we
 - **IAuthService**: `authenticate()`, `validateToken()`, `refreshToken()`
 - **IUserProfileService**: `getUserProfile()`, `updateUserProfile()`
 - **IConferenceMetadata**: `listConferences()`, `getConferenceDetails()`, `addConference()`, `updateConference()`, `findConferenceEndpoint()`
-- **IConferenceData**: `getSchedule()`, `listContentItems()`, `getContentItem()`, `listAuthors()`, `getRoomInfo()`
+- **IConferenceData**: `getSchedule()`, `listContentItems()`, `getContentItemDetails()`, `listAuthors()`, `getRoomInfo()`
 - **IUserNotes**: `createNote()`, `getNotesForUser()`, `getNotesForItem()`, `updateNote()`, `deleteNote()`
-- **IAnalytics**: `recordEvent()`, `queryMAU()`, `queryConferenceUsage()`
+- **IAnalytics**: `recordEngagementEvent()`, `getMonthlyActiveUsers()`, `getConferenceAccessStats()`
 
 ## Communication Patterns
 
