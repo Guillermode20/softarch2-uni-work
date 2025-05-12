@@ -14,11 +14,11 @@ end
 
 group Core Services
     participant AuthService <<Microservice>>
-    participant ConfMetaService <<Microservice>>
+    participant ConferenceMetadataService <<Microservice>>
 end
 
 group Conference Services
-    participant ConfDataService <<Microservice>>
+    participant ConferenceDataService <<Microservice>>
     database ConfDB <<Database>>
 end
 
@@ -42,22 +42,22 @@ AuthService --> APIGateway: OK (userId)
 deactivate AuthService
 
 ' Conference Metadata Flow
-APIGateway -> ConfMetaService: getConferenceEndpointInfo()
-activate ConfMetaService
-ConfMetaService --> APIGateway: EndpointInfo
-deactivate ConfMetaService
+APIGateway -> ConferenceMetadataService: getConferenceEndpointInfo()
+activate ConferenceMetadataService
+ConferenceMetadataService --> APIGateway: EndpointInfo
+deactivate ConferenceMetadataService
 
 ' Schedule Retrieval Flow
-APIGateway -> ConfDataService: GET /schedule
-activate ConfDataService
+APIGateway -> ConferenceDataService: GET /schedule
+activate ConferenceDataService
 
-ConfDataService -> ConfDB: Query Schedule
+ConferenceDataService -> ConfDB: Query Schedule
 activate ConfDB
-ConfDB --> ConfDataService: Schedule Data
+ConfDB --> ConferenceDataService: Schedule Data
 deactivate ConfDB
 
-ConfDataService --> APIGateway: Schedule Data
-deactivate ConfDataService
+ConferenceDataService --> APIGateway: Schedule Data
+deactivate ConferenceDataService
 
 ' Response Flow
 APIGateway --> FrontendApp: Schedule Data

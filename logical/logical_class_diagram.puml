@@ -25,6 +25,7 @@ package "Core Services" {
     class AuthService <<Microservice>> {
         + authenticate()
         + validateToken()
+        + refreshToken()
     }
 
     class UserProfileService <<Microservice>> {
@@ -38,6 +39,9 @@ package "Conference Services" {
     class ConferenceMetadataService <<Microservice>> {
         + listConferences()
         + getConferenceDetails()
+        + addConference()
+        + updateConference()
+        + findConferenceEndpoint()
     }
 
     class ConferenceDataService <<Microservice>> {
@@ -45,6 +49,7 @@ package "Conference Services" {
         + getContentItemDetails()
         + listContentItems()
         + getRooms()
+        + listAuthors()
     }
 }
 
@@ -74,6 +79,14 @@ package "Admin & Analytics" {
     }
 }
 
+' ===== Infrastructure =====
+package "Infrastructure" {
+    class EventBus <<Infrastructure>> {
+        + publishEvent()
+        + subscribeToEvents()
+    }
+}
+
 ' ===== Relationships =====
 ' Frontend to Gateway
 WebApp --> APIGateway : sends API requests
@@ -97,4 +110,12 @@ APIGateway ..> AnalyticsService : sends analytics data
 ' Admin Service Relationships
 AdminService --> ConferenceMetadataService : manages conferences
 AdminService --> AnalyticsService : views analytics
+
+' Event Bus Relationships
+APIGateway ..> EventBus : publishes events
+AuthService ..> EventBus : publishes events
+ConferenceMetadataService ..> EventBus : publishes events
+ConferenceDataService ..> EventBus : publishes events
+UserNotesService ..> EventBus : publishes events
+EventBus ..> AnalyticsService : delivers events
 @enduml

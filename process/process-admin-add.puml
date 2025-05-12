@@ -1,0 +1,88 @@
+@startuml
+!theme plain
+skinparam ClassAttributeIconSize 0
+skinparam roundcorner 10
+skinparam sequenceMessageAlign center
+title Add New Conference - Activity Diagram
+
+' ===== Admin Flow =====
+|Admin|
+start
+:Log in;
+:Open 'Add Conference';
+:Fill in details;
+:Submit;
+
+' ===== Admin Service Flow =====
+|Admin Service|
+:Receive request;
+:Validate input;
+if (Valid?) then (yes)
+  :Call Metadata Service;
+  
+  ' ===== Conference Metadata Service Flow =====
+  |Conference Metadata Service|
+  :Save conference info;
+  :Return ID;
+  
+  ' ===== Admin Service Flow (continued) =====
+  |Admin Service|
+  :Start provisioning;
+  
+  ' ===== Provisioning Flow =====
+  |Provisioning|
+  :Create database;
+  if (DB OK?) then (yes)
+    :Deploy service;
+    if (Service OK?) then (yes)
+      :Get endpoint;
+      :Update Metadata;
+      
+      ' ===== Conference Metadata Service Flow (continued) =====
+      |Conference Metadata Service|
+      :Save endpoint;
+      :Confirm update;
+      
+      ' ===== Provisioning Flow (continued) =====
+      |Provisioning|
+      :Mark success;
+      :Notify Admin Service;
+      
+      ' ===== Admin Service Flow (continued) =====
+      |Admin Service|
+      :Confirm to Admin;
+      
+      ' ===== Admin Flow (continued) =====
+      |Admin|
+      :Show success;
+      stop
+    else (no)
+      :Log error;
+      :Cleanup DB;
+      :Fail provisioning;
+      -> Fail;
+    endif
+  else (no)
+    :Log error;
+    :Fail provisioning;
+    -> Fail;
+  endif
+else (no)
+  :Send validation error;
+  
+  ' ===== Admin Flow (continued) =====
+  |Admin|
+  :Show error;
+  stop
+endif
+
+' ===== Failure Handling =====
+label Fail
+|Admin Service|
+:Log failure;
+:Notify Admin;
+
+|Admin|
+:Show failure;
+stop
+@enduml
