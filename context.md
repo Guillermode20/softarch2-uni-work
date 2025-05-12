@@ -10,7 +10,9 @@ The system is a microservice-based application for managing conferences, with we
 
 ### Frontend Clients
 - **WebApp**: Browser-based client interface
+  - Methods: `interactWithApi()`
 - **MobileApp**: Mobile application interface
+  - Methods: `interactWithApi()`
 - Both clients communicate with the backend exclusively through the API Gateway
 
 ### Core Services
@@ -23,6 +25,7 @@ The system is a microservice-based application for managing conferences, with we
   - Publish events to the event bus
 - **Endpoints**: Serves as the single entry point for all client requests
 - **Data**: Primarily passes data between clients and services without persistent storage
+- **Key Methods**: `routeRequest()`, `validateAuthToken()`, `aggregateResults()`
 
 #### Auth Service
 - **Primary Responsibilities**:
@@ -32,6 +35,7 @@ The system is a microservice-based application for managing conferences, with we
 - **Interfaces**: Implements `IAuthService`
 - **Data**: User credentials, authentication tokens
 - **Events**: Publishes login and Monthly Active Users (MAU) events to analytics
+- **Key Methods**: `authenticate()`, `validateToken()`, `refreshToken()`
 
 #### User Profile Service
 - **Primary Responsibilities**:
@@ -39,6 +43,7 @@ The system is a microservice-based application for managing conferences, with we
   - Update user profile information
 - **Interfaces**: Implements `IUserProfileService`
 - **Data**: User profile information (names, preferences, etc.)
+- **Key Methods**: `getUserProfile()`, `updateUserProfile()`
 
 ### Conference Services
 
@@ -53,6 +58,7 @@ The system is a microservice-based application for managing conferences, with we
 - **Data**: Conference metadata (titles, dates, locations, endpoints)
 - **Events**: Publishes events to analytics
 - **Admin Integration**: Receives conference management commands from Admin Service
+- **Key Methods**: `listConferences()`, `getConferenceDetails()`, `addConference()`, `updateConference()`, `findConferenceEndpoint()`
 
 #### Conference Data Service
 - **Primary Responsibilities**:
@@ -69,6 +75,7 @@ The system is a microservice-based application for managing conferences, with we
   - Speaker/author information
 - **Storage**: Utilizes conference-specific databases
 - **Events**: Publishes data access events to analytics
+- **Key Methods**: `getSchedule()`, `listContentItems()`, `getContentItemDetails()`, `getRooms()`, `listAuthors()`
 
 ### User Services
 
@@ -82,6 +89,7 @@ The system is a microservice-based application for managing conferences, with we
 - **Interfaces**: Implements `IUserNotes`
 - **Data**: User notes linked to conferences and content items
 - **Events**: Publishes note interaction events to analytics
+- **Key Methods**: `createNote()`, `getNotesForUser()`, `getNotesForItem()`, `updateNote()`, `deleteNote()`
 
 ### Admin & Analytics
 
@@ -95,6 +103,7 @@ The system is a microservice-based application for managing conferences, with we
   - `IConferenceMetadata` (for conference management)
   - `IAnalytics` (for viewing analytics data)
 - **Data**: Admin configuration, provisioning status
+- **Key Methods**: `triggerAddConference()`, `triggerUpdateConference()`, `viewSystemAnalytics()`
 
 #### Analytics Service
 - **Primary Responsibilities**:
@@ -104,6 +113,7 @@ The system is a microservice-based application for managing conferences, with we
 - **Interfaces**: Implements `IAnalytics`
 - **Data**: User engagement metrics, access patterns, usage statistics
 - **Event Consumption**: Subscribes to all system events via the Event Bus
+- **Key Methods**: `recordEngagementEvent()`, `getMonthlyActiveUsers()`, `getConferenceAccessStats()`
 
 ### Infrastructure Components
 
@@ -117,6 +127,16 @@ The system is a microservice-based application for managing conferences, with we
   - Data access events
   - Login/MAU events
   - Note interaction events
+- **Key Methods**: `publishEvent()`, `subscribeToEvents()`
+
+## Interfaces
+
+- **IAuthService**: `authenticate()`, `validateToken()`, `refreshToken()`
+- **IUserProfileService**: `getUserProfile()`, `updateUserProfile()`
+- **IConferenceMetadata**: `listConferences()`, `getConferenceDetails()`, `addConference()`, `updateConference()`, `findConferenceEndpoint()`
+- **IConferenceData**: `getSchedule()`, `listContentItems()`, `getContentItem()`, `listAuthors()`, `getRoomInfo()`
+- **IUserNotes**: `createNote()`, `getNotesForUser()`, `getNotesForItem()`, `updateNote()`, `deleteNote()`
+- **IAnalytics**: `recordEvent()`, `queryMAU()`, `queryConferenceUsage()`
 
 ## Communication Patterns
 
@@ -141,14 +161,15 @@ The system is a microservice-based application for managing conferences, with we
 7. API Gateway returns aggregated response to Frontend
 8. API Gateway publishes events to Event Bus for analytics
 
+> **Note:** This flow is an example based on the sequence diagram for retrieving a conference schedule. Other flows may follow similar patterns.
+
 ### Adding a New Conference (Admin)
 1. Admin logs in and submits conference details
 2. Admin Service validates input
 3. On valid input, Admin Service calls Metadata Service to save conference info
-4. Provisioning process creates database
-5. Provisioning process deploys service
-6. Endpoint is registered back in Metadata Service
-7. Admin is notified of success/failure
+4. **Provisioning process** creates database and deploys service (distinct actor/process)
+5. Endpoint is registered back in Metadata Service
+6. Admin is notified of success/failure
 
 ## Data Ownership
 Each microservice owns and is responsible for its own data domain:
@@ -157,4 +178,4 @@ Each microservice owns and is responsible for its own data domain:
 - Conference Metadata Service: Conference metadata
 - Conference Data Service: Conference content and schedule data
 - User Notes Service: User notes
-- Analytics Service: System metrics and analytics data 
+- Analytics Service: System metrics and analytics data
