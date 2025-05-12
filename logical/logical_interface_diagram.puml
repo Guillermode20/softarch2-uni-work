@@ -1,62 +1,79 @@
 @startuml
 !theme plain
-
 skinparam ClassAttributeIconSize 0
+skinparam roundcorner 10
+skinparam sequenceMessageAlign center
 
-interface IAuthService {
-    + authenticate()
-    + validateToken()
-    + refreshToken()
+' ===== Core Interfaces =====
+package "Core Interfaces" {
+    interface IAuthService {
+        + authenticate()
+        + validateToken()
+        + refreshToken()
+    }
+
+    interface IUserProfileService {
+        + getUserProfile()
+        + updateUserProfile()
+    }
 }
 
-interface IUserProfileService {
-    + getUserProfile()
-    + updateUserProfile()
+' ===== Conference Interfaces =====
+package "Conference Interfaces" {
+    interface IConferenceMetadata {
+        + listConferences()
+        + getConferenceDetails()
+        + addConference()
+        + updateConference()
+        + findConferenceEndpoint()
+    }
+
+    interface IConferenceData {
+        + getSchedule()
+        + listContentItems()
+        + getContentItem()
+        + listAuthors()
+        + getRoomInfo()
+    }
 }
 
-interface IConferenceMetadata {
-    + listConferences()
-    + getConferenceDetails()
-    + addConference()
-    + updateConference()
-    + findConferenceEndpoint()
+' ===== User Interfaces =====
+package "User Interfaces" {
+    interface IUserNotes {
+        + createNote()
+        + getNotesForUser()
+        + getNotesForItem()
+        + updateNote()
+        + deleteNote()
+    }
 }
 
-interface IConferenceData {
-    + getSchedule()
-    + listContentItems()
-    + getContentItem()
-    + listAuthors()
-    + getRoomInfo()
+' ===== Analytics Interface =====
+package "Analytics Interface" {
+    interface IAnalytics {
+        + recordEvent()
+        + queryMAU()
+        + queryConferenceUsage()
+    }
 }
 
-interface IUserNotes {
-    + createNote()
-    + getNotesForUser()
-    + getNotesForItem()
-    + updateNote()
-    + deleteNote()
+' ===== Service Implementations =====
+package "Service Implementations" {
+    class AuthService <<Microservice>>
+    class UserProfileService <<Microservice>>
+    class ConferenceMetadataService <<Microservice>>
+    class ConferenceDataService <<Microservice>>
+    class UserNotesService <<Microservice>>
+    class AnalyticsService <<Microservice>>
 }
 
-interface IAnalytics {
-    + recordEvent()
-    + queryMAU()
-    + queryConferenceUsage()
+' ===== Gateway & Admin =====
+package "Gateway & Admin" {
+    class APIGateway <<Microservice>>
+    class AdminService <<Microservice>>
 }
 
-class AuthService <<Microservice>>
-class UserProfileService <<Microservice>>
-class ConferenceMetadataService <<Microservice>>
-class ConferenceDataService <<Microservice>>
-note right of ConferenceDataService : Instance per conference\nor logically partitioned
-class UserNotesService <<Microservice>>
-class AnalyticsService <<Microservice>>
-
-class APIGateway <<Microservice>>
-note left of APIGateway : Consumes backend interfaces
-class AdminService <<Microservice>>
-note bottom of AdminService : Consumes interfaces
-
+' ===== Interface Implementations =====
 AuthService .up.|> IAuthService
 UserProfileService .up.|> IUserProfileService
 ConferenceMetadataService .up.|> IConferenceMetadata
@@ -64,6 +81,7 @@ ConferenceDataService .up.|> IConferenceData
 UserNotesService .up.|> IUserNotes
 AnalyticsService .up.|> IAnalytics
 
+' ===== Gateway Dependencies =====
 APIGateway --> IAuthService
 APIGateway --> IUserProfileService
 APIGateway --> IConferenceMetadata
@@ -71,9 +89,11 @@ APIGateway --> IConferenceData
 APIGateway --> IUserNotes
 APIGateway ..> IAnalytics
 
+' ===== Admin Dependencies =====
 AdminService --> IConferenceMetadata
 AdminService --> IAnalytics
 
+' ===== Analytics Dependencies =====
 AuthService ..> IAnalytics
 ConferenceMetadataService ..> IAnalytics
 ConferenceDataService ..> IAnalytics

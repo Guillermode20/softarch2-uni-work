@@ -1,68 +1,100 @@
 @startuml
 !theme plain
+skinparam ClassAttributeIconSize 0
+skinparam roundcorner 10
+skinparam sequenceMessageAlign center
 
-' Define representative Frontend Clients
-class WebApp <<Frontend>> {
-  + interactWithApi()
-}
-class MobileApp <<Frontend>> {
-  + interactWithApi()
-}
-
-' Define Microservices
-class APIGateway <<Microservice>> {
-  + routeRequest()
-  + validateAuthToken()
-  + aggregateResults()
-}
-class AuthService <<Microservice>> {
-  + authenticate()
-  + validateToken()
-}
-class UserProfileService <<Microservice>> {
-  + getUserProfile()
-  + updateUserProfile()
-}
-class ConferenceMetadataService <<Microservice>> {
-  + listConferences()
-  + getConferenceDetails()
-}
-class ConferenceDataService <<Microservice>> {
-  + getSchedule()
-  + getContentItemDetails()
-  + listContentItems()
-  + getRooms()
-}
-class UserNotesService <<Microservice>> {
-  + createNote()
-  + getNotesForUser()
-  + getNotesForItem()
-  + updateNote()
-  + deleteNote()
-}
-class AdminService <<Microservice>> {
-  + triggerAddConference()
-  + triggerUpdateConference()
-  + viewSystemAnalytics()
-}
-class AnalyticsService <<Microservice>> {
-  + recordEngagementEvent()
-  + getMonthlyActiveUsers()
-  + getConferenceAccessStats()
+' ===== Frontend Components =====
+package "Frontend Clients" {
+    class WebApp <<Frontend>> {
+        + interactWithApi()
+    }
+    class MobileApp <<Frontend>> {
+        + interactWithApi()
+    }
 }
 
-' Define Relationships
+' ===== Core Services =====
+package "Core Services" {
+    class APIGateway <<Microservice>> {
+        + routeRequest()
+        + validateAuthToken()
+        + aggregateResults()
+    }
+
+    class AuthService <<Microservice>> {
+        + authenticate()
+        + validateToken()
+    }
+
+    class UserProfileService <<Microservice>> {
+        + getUserProfile()
+        + updateUserProfile()
+    }
+}
+
+' ===== Conference Services =====
+package "Conference Services" {
+    class ConferenceMetadataService <<Microservice>> {
+        + listConferences()
+        + getConferenceDetails()
+    }
+
+    class ConferenceDataService <<Microservice>> {
+        + getSchedule()
+        + getContentItemDetails()
+        + listContentItems()
+        + getRooms()
+    }
+}
+
+' ===== User Services =====
+package "User Services" {
+    class UserNotesService <<Microservice>> {
+        + createNote()
+        + getNotesForUser()
+        + getNotesForItem()
+        + updateNote()
+        + deleteNote()
+    }
+}
+
+' ===== Admin & Analytics =====
+package "Admin & Analytics" {
+    class AdminService <<Microservice>> {
+        + triggerAddConference()
+        + triggerUpdateConference()
+        + viewSystemAnalytics()
+    }
+
+    class AnalyticsService <<Microservice>> {
+        + recordEngagementEvent()
+        + getMonthlyActiveUsers()
+        + getConferenceAccessStats()
+    }
+}
+
+' ===== Relationships =====
+' Frontend to Gateway
 WebApp --> APIGateway : sends API requests
 MobileApp --> APIGateway : sends API requests
 
+' Gateway to Core Services
 APIGateway --> AuthService : handles authentication
 APIGateway --> UserProfileService : manages user profiles
+
+' Gateway to Conference Services
 APIGateway --> ConferenceMetadataService : handles conference metadata
 APIGateway --> ConferenceDataService : manages conference data
+
+' Gateway to User Services
 APIGateway --> UserNotesService : manages user notes
+
+' Gateway to Admin & Analytics
 APIGateway --> AdminService : handles admin requests
 APIGateway ..> AnalyticsService : sends analytics data
 
+' Admin Service Relationships
 AdminService --> ConferenceMetadataService : manages conferences
 AdminService --> AnalyticsService : views analytics
 @enduml

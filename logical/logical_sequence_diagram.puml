@@ -1,22 +1,38 @@
 @startuml
-title Sequence Diagram: User Views Conference Schedule (Simplified)
+!theme plain
+skinparam ClassAttributeIconSize 0
+skinparam roundcorner 10
+skinparam sequenceMessageAlign center
 
+' ===== Participants =====
 actor User
 participant FrontendApp <<Web/Mobile>>
-participant APIGateway <<Microservice>>
-participant AuthService <<Microservice>>
-participant ConfMetaService <<Microservice>>
-participant ConfDataService <<Microservice>>
-database ConfDB <<Database>>
-participant EventBus <<Infrastructure>>
-participant AnalyticsService <<Microservice>>
 
-skinparam sequenceMessageAlign center
-skinparam roundcorner 10
+group API Gateway
+    participant APIGateway <<Microservice>>
+end
 
+group Core Services
+    participant AuthService <<Microservice>>
+    participant ConfMetaService <<Microservice>>
+end
+
+group Conference Services
+    participant ConfDataService <<Microservice>>
+    database ConfDB <<Database>>
+end
+
+group Event Processing
+    participant EventBus <<Infrastructure>>
+    participant AnalyticsService <<Microservice>>
+end
+
+' ===== Sequence Flow =====
+' Initial Request
 User -> FrontendApp: Request Schedule
 activate FrontendApp
 
+' Authentication Flow
 FrontendApp -> APIGateway: GET /conferences/{confId}/schedule (AuthToken)
 activate APIGateway
 
@@ -25,11 +41,13 @@ activate AuthService
 AuthService --> APIGateway: OK (userId)
 deactivate AuthService
 
+' Conference Metadata Flow
 APIGateway -> ConfMetaService: getConferenceEndpointInfo()
 activate ConfMetaService
 ConfMetaService --> APIGateway: EndpointInfo
 deactivate ConfMetaService
 
+' Schedule Retrieval Flow
 APIGateway -> ConfDataService: GET /schedule
 activate ConfDataService
 
@@ -41,12 +59,14 @@ deactivate ConfDB
 ConfDataService --> APIGateway: Schedule Data
 deactivate ConfDataService
 
+' Response Flow
 APIGateway --> FrontendApp: Schedule Data
 deactivate APIGateway
 
 FrontendApp -> User: Display Schedule
 deactivate FrontendApp
 
+' Analytics Flow
 APIGateway ->> EventBus: Publish "scheduleAccessed" event
 activate EventBus
 EventBus ->> AnalyticsService: Deliver event
