@@ -1,0 +1,81 @@
+@startuml
+!theme plain
+
+skinparam ClassAttributeIconSize 0
+
+interface IAuthService {
+    + authenticate()
+    + validateToken()
+    + refreshToken()
+}
+
+interface IUserProfileService {
+    + getUserProfile()
+    + updateUserProfile()
+}
+
+interface IConferenceMetadata {
+    + listConferences()
+    + getConferenceDetails()
+    + addConference()
+    + updateConference()
+    + findConferenceEndpoint()
+}
+
+interface IConferenceData {
+    + getSchedule()
+    + listContentItems()
+    + getContentItem()
+    + listAuthors()
+    + getRoomInfo()
+}
+
+interface IUserNotes {
+    + createNote()
+    + getNotesForUser()
+    + getNotesForItem()
+    + updateNote()
+    + deleteNote()
+}
+
+interface IAnalytics {
+    + recordEvent()
+    + queryMAU()
+    + queryConferenceUsage()
+}
+
+class AuthService <<Microservice>>
+class UserProfileService <<Microservice>>
+class ConferenceMetadataService <<Microservice>>
+class ConferenceDataService <<Microservice>>
+note right of ConferenceDataService : Instance per conference\nor logically partitioned
+class UserNotesService <<Microservice>>
+class AnalyticsService <<Microservice>>
+
+class APIGateway <<Microservice>>
+note left of APIGateway : Consumes backend interfaces
+class AdminService <<Microservice>>
+note bottom of AdminService : Consumes interfaces
+
+AuthService .up.|> IAuthService
+UserProfileService .up.|> IUserProfileService
+ConferenceMetadataService .up.|> IConferenceMetadata
+ConferenceDataService .up.|> IConferenceData
+UserNotesService .up.|> IUserNotes
+AnalyticsService .up.|> IAnalytics
+
+APIGateway --> IAuthService
+APIGateway --> IUserProfileService
+APIGateway --> IConferenceMetadata
+APIGateway --> IConferenceData
+APIGateway --> IUserNotes
+APIGateway ..> IAnalytics
+
+AdminService --> IConferenceMetadata
+AdminService --> IAnalytics
+
+AuthService ..> IAnalytics
+ConferenceMetadataService ..> IAnalytics
+ConferenceDataService ..> IAnalytics
+UserNotesService ..> IAnalytics
+@enduml

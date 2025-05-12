@@ -1,0 +1,57 @@
+@startuml
+title Sequence Diagram: User Views Conference Schedule (Simplified)
+
+actor User
+participant FrontendApp <<Web/Mobile>>
+participant APIGateway <<Microservice>>
+participant AuthService <<Microservice>>
+participant ConfMetaService <<Microservice>>
+participant ConfDataService <<Microservice>>
+database ConfDB <<Database>>
+participant EventBus <<Infrastructure>>
+participant AnalyticsService <<Microservice>>
+
+skinparam sequenceMessageAlign center
+skinparam roundcorner 10
+
+User -> FrontendApp: Request Schedule
+activate FrontendApp
+
+FrontendApp -> APIGateway: GET /conferences/{confId}/schedule (AuthToken)
+activate APIGateway
+
+APIGateway -> AuthService: validateToken()
+activate AuthService
+AuthService --> APIGateway: OK (userId)
+deactivate AuthService
+
+APIGateway -> ConfMetaService: getConferenceEndpointInfo()
+activate ConfMetaService
+ConfMetaService --> APIGateway: EndpointInfo
+deactivate ConfMetaService
+
+APIGateway -> ConfDataService: GET /schedule
+activate ConfDataService
+
+ConfDataService -> ConfDB: Query Schedule
+activate ConfDB
+ConfDB --> ConfDataService: Schedule Data
+deactivate ConfDB
+
+ConfDataService --> APIGateway: Schedule Data
+deactivate ConfDataService
+
+APIGateway --> FrontendApp: Schedule Data
+deactivate APIGateway
+
+FrontendApp -> User: Display Schedule
+deactivate FrontendApp
+
+APIGateway ->> EventBus: Publish "scheduleAccessed" event
+activate EventBus
+EventBus ->> AnalyticsService: Deliver event
+deactivate EventBus
+activate AnalyticsService
+AnalyticsService -> AnalyticsService: Process Event
+deactivate AnalyticsService
+@enduml

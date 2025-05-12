@@ -1,0 +1,68 @@
+@startuml
+!theme plain
+
+' Define representative Frontend Clients
+class WebApp <<Frontend>> {
+  + interactWithApi()
+}
+class MobileApp <<Frontend>> {
+  + interactWithApi()
+}
+
+' Define Microservices
+class APIGateway <<Microservice>> {
+  + routeRequest()
+  + validateAuthToken()
+  + aggregateResults()
+}
+class AuthService <<Microservice>> {
+  + authenticate()
+  + validateToken()
+}
+class UserProfileService <<Microservice>> {
+  + getUserProfile()
+  + updateUserProfile()
+}
+class ConferenceMetadataService <<Microservice>> {
+  + listConferences()
+  + getConferenceDetails()
+}
+class ConferenceDataService <<Microservice>> {
+  + getSchedule()
+  + getContentItemDetails()
+  + listContentItems()
+  + getRooms()
+}
+class UserNotesService <<Microservice>> {
+  + createNote()
+  + getNotesForUser()
+  + getNotesForItem()
+  + updateNote()
+  + deleteNote()
+}
+class AdminService <<Microservice>> {
+  + triggerAddConference()
+  + triggerUpdateConference()
+  + viewSystemAnalytics()
+}
+class AnalyticsService <<Microservice>> {
+  + recordEngagementEvent()
+  + getMonthlyActiveUsers()
+  + getConferenceAccessStats()
+}
+
+' Define Relationships
+WebApp --> APIGateway : sends API requests
+MobileApp --> APIGateway : sends API requests
+
+APIGateway --> AuthService : handles authentication
+APIGateway --> UserProfileService : manages user profiles
+APIGateway --> ConferenceMetadataService : handles conference metadata
+APIGateway --> ConferenceDataService : manages conference data
+APIGateway --> UserNotesService : manages user notes
+APIGateway --> AdminService : handles admin requests
+APIGateway ..> AnalyticsService : sends analytics data
+
+AdminService --> ConferenceMetadataService : manages conferences
+AdminService --> AnalyticsService : views analytics
+@enduml
