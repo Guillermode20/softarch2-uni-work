@@ -1,0 +1,84 @@
+@startuml DevelopmentHighLevelComponentDiagram
+!theme plain
+skinparam roundcorner 10
+skinparam shadowing false
+skinparam componentStyle uml2
+skinparam DefaultFontName "Arial"
+skinparam DefaultFontSize 12
+
+title Development View: High-Level Microservice Components (with Databases)
+
+' ===== Frontend Clients =====
+package "Frontend Clients" {
+    component WebApp <<Frontend>>
+    component MobileApp <<Frontend>>
+}
+
+' ===== API Gateway =====
+package "API Gateway" {
+    component APIGateway
+}
+
+' ===== Core Services =====
+package "Core Services" {
+    component AuthService <<Microservice>>
+    component UserProfileService <<Microservice>>
+    database UserProfileDB <<Database>>
+}
+
+' ===== Conference Services =====
+package "Conference Services" {
+    component ConferenceMetadataService <<Microservice>>
+    database ConferenceMetadataDB <<Database>>
+    component ConferenceDataService <<Microservice>>
+    database ConferenceDataDB <<Database>>
+}
+
+' ===== User Services =====
+package "User Services" {
+    component UserNotesService <<Microservice>>
+    database UserNotesDB <<Database>>
+}
+
+' ===== Admin & Analytics =====
+package "Admin & Analytics" {
+    component AdminService <<Microservice>>
+    component AnalyticsService <<Microservice>>
+    database AnalyticsDB <<Database>>
+}
+
+' ===== Infrastructure =====
+package "Infrastructure" {
+    component EventBus <<Infrastructure>>
+}
+
+' ===== Dependencies =====
+
+WebApp ..> APIGateway : HTTP Requests
+MobileApp ..> APIGateway : HTTP Requests
+
+APIGateway ..> AuthService : Routes requests
+APIGateway ..> UserProfileService : Routes requests
+APIGateway ..> ConferenceMetadataService : Routes requests
+APIGateway ..> ConferenceDataService : Routes requests
+APIGateway ..> UserNotesService : Routes requests
+APIGateway ..> EventBus : Publishes events
+
+AdminService ..> ConferenceMetadataService : Manages conferences
+AdminService ..> AnalyticsService : Views analytics
+
+AuthService ..> EventBus : Publishes login/MAU events
+ConferenceMetadataService ..> EventBus : Publishes events
+ConferenceDataService ..> EventBus : Publishes data access events
+UserNotesService ..> EventBus : Publishes note interaction events
+
+EventBus ..> AnalyticsService : Delivers events for processing
+
+' ===== Database Connections =====
+UserProfileService ..> UserProfileDB : Reads/Writes
+ConferenceMetadataService ..> ConferenceMetadataDB : Reads/Writes
+ConferenceDataService ..> ConferenceDataDB : Reads/Writes
+UserNotesService ..> UserNotesDB : Reads/Writes
+AnalyticsService ..> AnalyticsDB : Reads/Writes
+
+@enduml
