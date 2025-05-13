@@ -1,12 +1,17 @@
-@startuml
+@startuml UserScheduleRetrievalSequence
 !theme plain
 skinparam ClassAttributeIconSize 0
 skinparam roundcorner 10
 skinparam sequenceMessageAlign center
+skinparam DefaultFontName "Arial"
+skinparam DefaultFontSize 12
+skinparam shadowing false
+
+title User Retrieves Conference Schedule Sequence
 
 ' ===== Participants =====
-actor User
-participant FrontendApp <<Web/Mobile>>
+actor User <<Actor>>
+participant FrontendApp <<Frontend>>
 
 group API Gateway
     participant APIGateway <<Microservice>>

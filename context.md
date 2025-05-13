@@ -179,3 +179,114 @@ Each microservice owns and is responsible for its own data domain:
 - Conference Data Service: Conference content and schedule data
 - User Notes Service: User notes
 - Analytics Service: System metrics and analytics data
+
+## PlantUML Style Guide
+
+This style guide aims to ensure consistency and readability across all PlantUML diagrams in this project.
+
+### 1. General Guidelines
+
+*   **File Naming:**
+    *   Use lowercase with hyphens for separators.
+    *   Structure: `<diagram-type>-<description>.puml`
+    *   Examples: `class-logical-overview.puml`, `sequence-user-authentication.puml`, `activity-admin-conference-creation.puml`.
+*   **Diagram Naming (within the file):**
+    *   Always start your diagram definition with `@startuml DiagramName`.
+    *   `DiagramName` should be descriptive and use PascalCase or underscores.
+    *   Example: `@startuml UserAuthenticationSequence`, `@startuml LogicalClassOverview`.
+*   **Titles:**
+    *   Always include a diagram title using the `title` keyword for clarity.
+    *   Example: `title User Authentication Sequence Flow`.
+
+### 2. Theme and Skin Parameters
+
+*   **Theme:**
+    *   Always use `!theme plain` at the beginning of your diagram to ensure a consistent, minimal look.
+*   **Standard Skin Parameters:**
+    *   `skinparam ClassAttributeIconSize 0` (Hides class attribute icons for a cleaner look)
+    *   `skinparam roundcorner 10` (Applies rounded corners to elements)
+    *   `skinparam sequenceMessageAlign center` (For sequence diagrams, centers messages on arrows)
+    *   `skinparam DefaultFontName "Arial"` (Or your preferred project font)
+    *   `skinparam DefaultFontSize 12`
+    *   `skinparam shadowing false` (Disable shadows for a flatter design, optional)
+    *   Avoid excessive custom skin parameters unless necessary for specific diagrammatic needs. Focus on clarity.
+
+### 3. Diagram Elements
+
+*   **Participants, Actors, Classes, Interfaces, Components:**
+    *   Use **PascalCase** for names (e.g., `UserProfileService`, `IAuthService`, `WebAppClient`).
+    *   Use stereotypes consistently to denote the type of element:
+        *   `<<Actor>>` for users or external systems.
+        *   `<<Microservice>>` for microservice components.
+        *   `<<Interface>>` for interfaces.
+        *   `<<Component>>` for general components.
+        *   `<<Database>>` for databases.
+        *   `<<Frontend>>` for client applications.
+        *   `<<Infrastructure>>` for elements like Event Bus.
+*   **Methods and Attributes:**
+    *   Use **camelCase** (e.g., `getUserProfile()`, `conferenceId`).
+*   **Packages and Grouping:**
+    *   `package "Descriptive Name" { ... }`: For logical grouping in class, component, or deployment diagrams.
+    *   `group Group Name ... end`: For grouping messages in sequence diagrams.
+    *   `|Swimlane Name|`: For swimlanes in activity diagrams. Use PascalCase for swimlane names.
+*   **Relationships and Arrows:**
+    *   Use standard PlantUML arrow notations. Be consistent in their meaning:
+        *   `->` or `-->`: Directed association, synchronous call.
+        *   `..>` or `..>>`: Dashed arrow for replies, asynchronous messages, or dependencies.
+        *   `.up.|>`: Interface implementation (arrow points towards the interface).
+        *   `*-`: Composition.
+        *   `o-`: Aggregation.
+    *   Label relationships clearly to describe the interaction or dependency.
+*   **Notes:**
+    *   Use notes (`note left of X`, `note right of X`, `note over X, Y`) to add explanations or context where the diagram itself might not be clear.
+*   **Activations (Sequence Diagrams):**
+    *   Use `activate` and `deactivate` to clearly show participant lifelines and focus of activity.
+*   **Conditionals and Loops:**
+    *   Use `alt / else / end`, `opt / end`, `loop / end` for control flows in sequence diagrams.
+    *   Use `if (condition) then (yes) ... else (no) ... endif` in activity diagrams.
+
+### 4. Layout and Readability
+
+*   **Comments:**
+    *   Use single-quote comments (`'`) to structure the PlantUML code, explain complex parts, or separate sections (e.g., `' ===== Participants =====`, `' ===== Main Flow =====`).
+*   **Clarity over Complexity:**
+    *   Keep diagrams focused on a specific process, interaction, or structure.
+    *   Break down very complex systems into multiple, more straightforward diagrams.
+*   **Organization:**
+    *   Define participants/actors at the top.
+    *   Group related elements or flows together.
+
+### 5. Example Snippet
+
+```plantuml
+@startuml ExampleSequenceDiagram
+!theme plain
+skinparam ClassAttributeIconSize 0
+skinparam roundcorner 10
+skinparam sequenceMessageAlign center
+skinparam DefaultFontName "Arial"
+skinparam DefaultFontSize 12
+
+title Example User Login Sequence
+
+actor User <<Actor>>
+participant WebApp <<Frontend>>
+participant AuthService <<Microservice>>
+
+' ===== User Login Flow =====
+User -> WebApp: Enters credentials and clicks Login
+activate WebApp
+
+WebApp -> AuthService: POST /login (username, password)
+activate AuthService
+AuthService -> AuthService: Validate credentials
+AuthService --> WebApp: JWT Token / Error
+deactivate AuthService
+
+alt Login Successful
+    WebApp -> User: Display Welcome Page
+else Login Failed
+    WebApp -> User: Display Error Message
+end
+deactivate WebApp
+@enduml

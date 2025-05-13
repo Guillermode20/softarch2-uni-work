@@ -1,8 +1,11 @@
-@startuml
+@startuml AdminAddConferenceActivity
 !theme plain
 skinparam ClassAttributeIconSize 0
 skinparam roundcorner 10
 skinparam sequenceMessageAlign center
+skinparam DefaultFontName "Arial"
+skinparam DefaultFontSize 12
+skinparam shadowing false
 title Add New Conference - Activity Diagram
 
 ' ===== Admin Flow =====

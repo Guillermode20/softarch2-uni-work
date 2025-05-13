@@ -1,8 +1,13 @@
-@startuml
+@startuml LogicalClassDiagram
 !theme plain
 skinparam ClassAttributeIconSize 0
 skinparam roundcorner 10
 skinparam sequenceMessageAlign center
+skinparam DefaultFontName "Arial"
+skinparam DefaultFontSize 12
+skinparam shadowing false
+
+title Logical Class Diagram
 
 ' ===== Frontend Components =====
 package "Frontend Clients" {

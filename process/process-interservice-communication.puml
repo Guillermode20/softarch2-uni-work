@@ -1,12 +1,15 @@
-@startuml
+@startuml InterServiceCommunicationPatterns
 !theme plain
 skinparam ClassAttributeIconSize 0
 skinparam roundcorner 10
 skinparam sequenceMessageAlign center
+skinparam DefaultFontName "Arial"
+skinparam DefaultFontSize 12
+skinparam shadowing false
 title High-Level Inter-Service Communication Patterns
 
 ' ===== Participants =====
-participant Frontend <<Client>>
+participant Frontend <<Frontend>>
 participant APIGateway <<Microservice>>
 participant AuthService <<Microservice>>
 participant UserProfileService <<Microservice>>
@@ -18,28 +21,30 @@ participant EventBus <<Infrastructure>>
 participant AnalyticsService <<Microservice>>
 
 ' ===== Standard User Flow =====
-== Standard User Flow ==
+' == Standard User Flow ==
+' Using single quote comments for sections as per style guide
+' ===== Standard User Flow =====
 
-Frontend -> APIGateway : HTTPS Request (e.g., Get Schedule, Get Note)
+Frontend -> APIGateway : HTTPS Request (e.g., getSchedule(), getNote())
 note right of APIGateway : Single Entry Point
 
 activate APIGateway
-APIGateway -> AuthService : 1. Validate Token (Sync Call)
+APIGateway -> AuthService : 1. validateToken() (Sync Call)
 activate AuthService
 AuthService --> APIGateway : User Context / Validation Result
 deactivate AuthService
 
-APIGateway -> ConferenceMetadataService : 2. Get Conf Info (e.g., Endpoint) (Sync Call)
+APIGateway -> ConferenceMetadataService : 2. getConferenceInfo() (e.g., Endpoint) (Sync Call)
 activate ConferenceMetadataService
 ConferenceMetadataService --> APIGateway : Metadata / Endpoint
 deactivate ConferenceMetadataService
 
-APIGateway -> ConferenceDataService : 3. Request Conference Data (Sync Call)
+APIGateway -> ConferenceDataService : 3. requestConferenceData() (Sync Call)
 activate ConferenceDataService
 ConferenceDataService --> APIGateway : Schedule / Content Data
 deactivate ConferenceDataService
 
-APIGateway -> UserNotesService : 4. Request/Manage Notes (Sync Call)
+APIGateway -> UserNotesService : 4. requestOrManageNotes() (Sync Call)
 activate UserNotesService
 UserNotesService --> APIGateway : Notes Data / Confirmation
 deactivate UserNotesService
@@ -50,24 +55,28 @@ APIGateway --> Frontend : Aggregated Response
 deactivate APIGateway
 
 ' ===== Administration Flow =====
-== Administration Flow ==
+' == Administration Flow ==
+' Using single quote comments for sections as per style guide
+' ===== Administration Flow =====
 
 ' Admin interactions typically also go via API Gateway, but show logical need here
-AdminService -> ConferenceMetadataService : Manage Conferences (Add/Update) (Sync Call)
+AdminService -> ConferenceMetadataService : manageConferences() (Add/Update) (Sync Call)
 note left of AdminService : Admin actions often\nmediated by APIGateway
 activate ConferenceMetadataService
 ConferenceMetadataService --> AdminService : Confirmation
 deactivate ConferenceMetadataService
 
 ' ===== Asynchronous Analytics Events =====
-== Asynchronous Analytics Events ==
+' == Asynchronous Analytics Events ==
+' Using single quote comments for sections as per style guide
+' ===== Asynchronous Analytics Events =====
 
 note over EventBus : Decouples event producers & consumers
 
-APIGateway ->> EventBus : Publish(User Activity Event)
-ConferenceDataService ->> EventBus : Publish(Data Access Event)
-AuthService ->> EventBus : Publish(Login/MAU Event)
-UserNotesService ->> EventBus : Publish(Note Interaction Event)
+APIGateway ->> EventBus : publishEvent(UserActivityEvent)
+ConferenceDataService ->> EventBus : publishEvent(DataAccessEvent)
+AuthService ->> EventBus : publishEvent(LoginMAUEvent)
+UserNotesService ->> EventBus : publishEvent(NoteInteractionEvent)
 ' Other services might also publish events
 
 EventBus ->> AnalyticsService : Deliver Events (Async)
