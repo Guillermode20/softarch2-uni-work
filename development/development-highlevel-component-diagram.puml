@@ -2,54 +2,53 @@
 !theme plain
 skinparam roundcorner 10
 skinparam shadowing false
-skinparam componentStyle uml2
 skinparam DefaultFontName "Arial"
 skinparam DefaultFontSize 12
 
 title Development View: High-Level Microservice Components (with Databases)
 
 ' ===== Frontend Clients =====
-package "Frontend Clients" {
-    component WebApp <<Frontend>>
-    component MobileApp <<Frontend>>
+rectangle "Frontend Clients" {
+    artifact WebApp <<Frontend>>
+    artifact MobileApp <<Frontend>>
 }
 
 ' ===== API Gateway =====
-package "API Gateway" {
-    component APIGateway
+rectangle "API Gateway" {
+    artifact APIGateway <<Microservice>>
 }
 
 ' ===== Core Services =====
-package "Core Services" {
-    component AuthService <<Microservice>>
-    component UserProfileService <<Microservice>>
+rectangle "Core Services" {
+    artifact AuthService <<Microservice>>
+    artifact UserProfileService <<Microservice>>
     database UserProfileDB <<Database>>
 }
 
 ' ===== Conference Services =====
-package "Conference Services" {
-    component ConferenceMetadataService <<Microservice>>
+rectangle "Conference Services" {
+    artifact ConferenceMetadataService <<Microservice>>
     database ConferenceMetadataDB <<Database>>
-    component ConferenceDataService <<Microservice>>
+    artifact ConferenceDataService <<Microservice>>
     database ConferenceDataDB <<Database>>
 }
 
 ' ===== User Services =====
-package "User Services" {
-    component UserNotesService <<Microservice>>
+rectangle "User Services" {
+    artifact UserNotesService <<Microservice>>
     database UserNotesDB <<Database>>
 }
 
 ' ===== Admin & Analytics =====
-package "Admin & Analytics" {
-    component AdminService <<Microservice>>
-    component AnalyticsService <<Microservice>>
+rectangle "Admin & Analytics" {
+    artifact AdminService <<Microservice>>
+    artifact AnalyticsService <<Microservice>>
     database AnalyticsDB <<Database>>
 }
 
 ' ===== Infrastructure =====
-package "Infrastructure" {
-    component EventBus <<Infrastructure>>
+rectangle "Infrastructure" {
+    artifact EventBus <<Infrastructure>>
 }
 
 ' ===== Dependencies =====

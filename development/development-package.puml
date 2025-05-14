@@ -1,0 +1,46 @@
+@startuml UserNotesServiceInternalPackage
+allowmixing
+!theme plain
+skinparam ClassAttributeIconSize 0
+skinparam roundcorner 10
+skinparam DefaultFontName "Arial"
+skinparam DefaultFontSize 12
+skinparam shadowing false
+
+title Example Service Internal Structure (UserNotesService)
+
+' ===== Internal Packages =====
+rectangle "Api" {
+  artifact Api <<Component>>
+  ' Handles incoming HTTP/gRPC requests
+}
+
+rectangle "Service" {
+  artifact Service <<Component>>
+  ' Business logic, orchestrates between Domain and Repository
+}
+
+rectangle "Domain" {
+  artifact Domain <<Component>>
+  ' Core entities (e.g., Note)
+}
+
+rectangle "Repository" {
+  artifact Repository <<Component>>
+  ' Data access, persistence logic
+}
+
+rectangle "Config" {
+  artifact Config <<Component>>
+  ' Configuration, infrastructure utilities
+}
+
+' ===== Dependencies =====
+Api --> Service : Handles requests via
+Service --> Domain : Uses domain entities
+Service --> Repository : Persists/fetches data
+Repository --> Domain : Maps entities
+Service --> Config : Reads config
+Repository --> Config : Reads config
+
+@enduml

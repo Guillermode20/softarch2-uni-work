@@ -1,0 +1,55 @@
+@startuml PhysicalNetworkTopology
+!theme plain
+skinparam ClassAttributeIconSize 0
+skinparam roundcorner 10
+skinparam DefaultFontName "Arial"
+skinparam DefaultFontSize 12
+skinparam shadowing false
+
+title AWS Network Topology & Security Zones
+
+' ===== Network Zones =====
+rectangle "Public Internet" as PublicInternet {
+  node "WebAppClient" <<Frontend>> as WebApp
+  node "MobileAppClient" <<Frontend>> as MobileApp
+}
+
+rectangle "Public Subnet" as DMZ {
+  node "AWS Application Load Balancer" <<Infrastructure>> as AWSALB
+  node "APIGateway" <<Microservice>> as APIGateway
+}
+
+rectangle "Private Subnet" as PrivateSubnet {
+  node "EKSCluster" <<Infrastructure>> as EKSCluster {
+    artifact "AuthService" <<Microservice>>
+    artifact "UserProfileService" <<Microservice>>
+    artifact "ConferenceMetadataService" <<Microservice>>
+    artifact "ConferenceDataService" <<Microservice>>
+    artifact "UserNotesService" <<Microservice>>
+    artifact "AdminService" <<Microservice>>
+    artifact "AnalyticsService" <<Microservice>>
+  }
+  node "RDSCluster" <<Database>> as RDSCluster {
+    database "Conference DBs" <<Database>>
+    database "Shared Service DBs" <<Database>>
+  }
+  node "AWS SNS/SQS" <<Infrastructure>> as EventBus
+  database "AnalyticsDB" <<Database>> as AnalyticsDB
+}
+
+' ===== Traffic Flows & Firewall Rules =====
+WebApp --> AWSALB : HTTPS (443)
+MobileApp --> AWSALB : HTTPS (443)
+
+AWSALB --> APIGateway : HTTP(S) (80/443)
+APIGateway --> EKSCluster : Internal API Calls (TCP 8080+)
+' Microservices to Databases
+EKSCluster --> RDSCluster : DB Access (TCP 5432)
+' Microservices to Event Bus
+EKSCluster --> EventBus : Internal Events (TCP 5672+)
+EventBus --> AnalyticsService : Event Delivery
+
+' Analytics Service to Analytics DB
+AnalyticsService --> AnalyticsDB : Analytics Data (TCP 5439)
+
+@enduml

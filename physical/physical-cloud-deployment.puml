@@ -1,0 +1,79 @@
+@startuml CloudDeploymentOverview
+!theme plain
+skinparam ClassAttributeIconSize 0
+skinparam roundcorner 10
+skinparam DefaultFontName "Arial"
+skinparam DefaultFontSize 12
+skinparam shadowing false
+
+title AWS Cloud Deployment Overview
+
+' ===== Frontend Clients =====
+node "WebAppClient" <<Frontend>> as WebApp
+node "MobileAppClient" <<Frontend>> as MobileApp
+
+' ===== AWS Application Load Balancer =====
+node "AWS Application Load Balancer" <<Infrastructure>> as AWSALB
+
+' ===== API Gateway =====
+node "APIGateway" <<Microservice>> as APIGateway
+
+' ===== AWS EKS Cluster =====
+node "EKSCluster" <<Infrastructure>> as EKSCluster {
+  artifact "AuthService" <<Microservice>>
+  artifact "UserProfileService" <<Microservice>>
+  artifact "ConferenceMetadataService" <<Microservice>>
+  artifact "ConferenceDataService" <<Microservice>>
+  artifact "UserNotesService" <<Microservice>>
+  artifact "AdminService" <<Microservice>>
+  artifact "AnalyticsService" <<Microservice>>
+}
+
+' ===== AWS RDS Cluster (Databases) =====
+node "RDSCluster" <<Database>> as RDSCluster {
+  database "Conference DBs" <<Database>>
+  database "Shared Service DBs" <<Database>>
+}
+
+' ===== AWS SNS/SQS Event Bus =====
+node "AWS SNS/SQS" <<Infrastructure>> as EventBus
+
+' ===== Analytics Data Store (Redshift) =====
+database "Analytics DB" <<Database>> as AnalyticsDB
+
+' ===== Connections =====
+WebApp --> AWSALB : HTTPS
+MobileApp --> AWSALB : HTTPS
+AWSALB --> APIGateway : HTTP(S)
+APIGateway --> EKSCluster : Internal API Calls
+
+' API Gateway routes to microservices (simplified)
+APIGateway --> AuthService
+APIGateway --> UserProfileService
+APIGateway --> ConferenceMetadataService
+APIGateway --> ConferenceDataService
+APIGateway --> UserNotesService
+APIGateway --> AdminService
+
+' Microservices to Databases (grouped)
+AuthService --> RDSCluster
+UserProfileService --> RDSCluster
+ConferenceMetadataService --> RDSCluster
+ConferenceDataService --> RDSCluster
+UserNotesService --> RDSCluster
+
+' Microservices to Event Bus
+AuthService --> EventBus
+UserProfileService --> EventBus
+ConferenceMetadataService --> EventBus
+ConferenceDataService --> EventBus
+UserNotesService --> EventBus
+AdminService --> EventBus
+
+' Event Bus to Analytics Service
+EventBus --> AnalyticsService
+
+' Analytics Service to Analytics Data Store
+AnalyticsService --> AnalyticsDB
+
+@enduml

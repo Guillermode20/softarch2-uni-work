@@ -10,86 +10,38 @@ skinparam shadowing false
 title Logical Class Diagram
 
 ' ===== Frontend Components =====
-package "Frontend Clients" {
-    class WebApp <<Frontend>> {
-        + interactWithApi()
-    }
-    class MobileApp <<Frontend>> {
-        + interactWithApi()
-    }
+rectangle "Frontend Clients" {
+    artifact WebApp <<Frontend>>
+    artifact MobileApp <<Frontend>>
 }
 
 ' ===== Core Services =====
-package "Core Services" {
-    class APIGateway <<Microservice>> {
-        + routeRequest()
-        + validateAuthToken()
-        + aggregateResults()
-    }
-
-    class AuthService <<Microservice>> {
-        + authenticate()
-        + validateToken()
-        + refreshToken()
-    }
-
-    class UserProfileService <<Microservice>> {
-        + getUserProfile()
-        + updateUserProfile()
-    }
+rectangle "Core Services" {
+    artifact APIGateway <<Microservice>>
+    artifact AuthService <<Microservice>>
+    artifact UserProfileService <<Microservice>>
 }
 
 ' ===== Conference Services =====
-package "Conference Services" {
-    class ConferenceMetadataService <<Microservice>> {
-        + listConferences()
-        + getConferenceDetails()
-        + addConference()
-        + updateConference()
-        + findConferenceEndpoint()
-    }
-
-    class ConferenceDataService <<Microservice>> {
-        + getSchedule()
-        + getContentItemDetails()
-        + listContentItems()
-        + getRooms()
-        + listAuthors()
-    }
+rectangle "Conference Services" {
+    artifact ConferenceMetadataService <<Microservice>>
+    artifact ConferenceDataService <<Microservice>>
 }
 
 ' ===== User Services =====
-package "User Services" {
-    class UserNotesService <<Microservice>> {
-        + createNote()
-        + getNotesForUser()
-        + getNotesForItem()
-        + updateNote()
-        + deleteNote()
-    }
+rectangle "User Services" {
+    artifact UserNotesService <<Microservice>>
 }
 
 ' ===== Admin & Analytics =====
-package "Admin & Analytics" {
-    class AdminService <<Microservice>> {
-        + triggerAddConference()
-        + triggerUpdateConference()
-        + viewSystemAnalytics()
-    }
-
-    class AnalyticsService <<Microservice>> {
-        + recordEngagementEvent()
-        + getMonthlyActiveUsers()
-        + getConferenceAccessStats()
-    }
+rectangle "Admin & Analytics" {
+    artifact AdminService <<Microservice>>
+    artifact AnalyticsService <<Microservice>>
 }
 
 ' ===== Infrastructure =====
-package "Infrastructure" {
-    class EventBus <<Infrastructure>> {
-        + publishEvent()
-        + subscribeToEvents()
-    }
+rectangle "Infrastructure" {
+    artifact EventBus <<Infrastructure>>
 }
 
 ' ===== Relationships =====
