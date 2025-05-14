@@ -7,7 +7,7 @@ skinparam DefaultFontName "Arial"
 skinparam DefaultFontSize 12
 skinparam shadowing false
 
-title User Note Creation Flow
+title Simplified User Note Creation Flow
 
 ' ===== Participants =====
 actor User <<Actor>>
@@ -15,42 +15,21 @@ participant Frontend <<Frontend>>
 participant APIGateway <<Microservice>>
 participant AuthService <<Microservice>>
 participant UserNotesService <<Microservice>>
-participant AnalyticsService <<Microservice>>
 
-' ===== User Submits Note =====
-User -> Frontend: Submits note (contentItemId, noteText)
-activate Frontend
-
-Frontend -> APIGateway: POST /notes (authToken, contentItemId, noteText)
-activate APIGateway
-
-APIGateway -> AuthService: validateToken(authToken)
-activate AuthService
+' ===== User Note Creation Flow =====
+User -> Frontend: Submit note
+Frontend -> APIGateway: POST /notes
+APIGateway -> AuthService: Validate token
 AuthService --> APIGateway: Token valid / invalid
-deactivate AuthService
 
-alt Token is valid
-    APIGateway -> UserNotesService: createNote(userId, contentItemId, noteText)
-    activate UserNotesService
-    UserNotesService -> UserNotesService: Validate request (user, contentItem)
-    UserNotesService -> UserNotesService: Store note in DB (userId, contentItemId)
-    UserNotesService --> APIGateway: Note creation success / failure
-    
-    opt Send engagement event
-        UserNotesService -> AnalyticsService: recordEngagementEvent(type="note_created", userId, contentItemId)
-        activate AnalyticsService
-        AnalyticsService --> UserNotesService: Event Acknowledged
-        deactivate AnalyticsService
-    end
-    deactivate UserNotesService
-    
-    APIGateway --> Frontend: Response (success / failure)
-    Frontend --> User: Display success / failure message
-else Token is invalid
-    APIGateway --> Frontend: Error: Unauthorized
-    Frontend --> User: Display error message
+alt Token valid
+    APIGateway -> UserNotesService: Create note
+    UserNotesService --> APIGateway: Success / failure
+    APIGateway --> Frontend: Response
+    Frontend --> User: Show result
+else Token invalid
+    APIGateway --> Frontend: Unauthorized error
+    Frontend --> User: Show error
 end
 
-deactivate APIGateway
-deactivate Frontend
 @enduml

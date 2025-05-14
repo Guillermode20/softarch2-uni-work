@@ -1,0 +1,67 @@
+@startuml ScenariosCoreUse
+!theme plain
+skinparam ClassAttributeIconSize 0
+skinparam roundcorner 10
+skinparam DefaultFontName "Arial"
+skinparam DefaultFontSize 12
+skinparam shadowing false
+
+title Core Use Cases
+
+actor RegisteredUser <<Actor>>
+actor Administrator <<Actor>>
+
+(Authenticate)
+(ViewConferenceList)
+(ViewConferenceSchedule)
+(ManagePersonalNotes)
+(CreateNote)
+(ViewNote)
+(DeleteNote)
+(ManageConferences)
+(AddConference)
+(UpdateConference)
+(ViewSystemAnalytics)
+(ViewContentItemDetails)
+
+RegisteredUser -- (Authenticate)
+RegisteredUser -- (ViewConferenceList)
+RegisteredUser -- (ViewConferenceSchedule)
+RegisteredUser -- (ManagePersonalNotes)
+RegisteredUser -- (CreateNote)
+RegisteredUser -- (ViewNote)
+RegisteredUser -- (DeleteNote)
+
+Administrator -- (ManageConferences)
+Administrator -- (AddConference)
+Administrator -- (UpdateConference)
+Administrator -- (ViewSystemAnalytics)
+
+(ViewConferenceList) ..> (Authenticate) : <<include>>
+(ViewConferenceSchedule) ..> (Authenticate) : <<include>>
+(ManagePersonalNotes) ..> (Authenticate) : <<include>>
+(CreateNote) ..> (ManagePersonalNotes) : <<extend>>
+(ViewNote) ..> (ManagePersonalNotes) : <<extend>>
+(DeleteNote) ..> (ManagePersonalNotes) : <<extend>>
+
+(ManageConferences) ..> (Authenticate) : <<include>>
+(AddConference) ..> (ManageConferences) : <<extend>>
+(UpdateConference) ..> (ManageConferences) : <<extend>>
+
+(ViewSystemAnalytics) ..> (Authenticate) : <<include>>
+(ViewConferenceSchedule) ..> (ViewContentItemDetails) : <<extend>>
+(ViewConferenceList) ..> (ViewConferenceSchedule) : <<extend>>
+
+note right of (ManagePersonalNotes)
+  User can create, view, or delete notes
+end note
+
+note right of (ManageConferences)
+  Admin can add or update conferences
+end note
+
+note right of (ViewContentItemDetails)
+  Includes talks, sessions, speakers, rooms
+end note
+
+@enduml

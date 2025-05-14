@@ -1,0 +1,59 @@
+@startuml EngagementTrackingSequence
+!theme plain
+skinparam ClassAttributeIconSize 0
+skinparam roundcorner 10
+skinparam sequenceMessageAlign center
+skinparam DefaultFontName "Arial"
+skinparam DefaultFontSize 12
+skinparam shadowing false
+
+title End-to-End Engagement Tracking Sequence
+
+' ===== Participants =====
+actor User <<Actor>>
+participant "Web App" as WebApp <<Frontend>>
+participant "API Gateway" as APIGateway <<Microservice>>
+participant "Conference Data Service" as ConferenceDataService <<Microservice>>
+participant "Event Bus" as EventBus <<Infrastructure>>
+participant "Analytics Service" as AnalyticsService <<Microservice>>
+
+' ===== Main Flow =====
+User -> WebApp: View content item detail
+activate WebApp
+
+WebApp -> APIGateway: interactWithApi(contentItemId)
+activate APIGateway
+
+APIGateway -> ConferenceDataService: getContentItemDetails(contentItemId, userId)
+activate ConferenceDataService
+
+ConferenceDataService -> ConferenceDataService: Retrieve content details
+ConferenceDataService --> APIGateway: Content details
+deactivate ConferenceDataService
+
+APIGateway --> WebApp: Content details
+deactivate APIGateway
+
+WebApp --> User: Display content item
+deactivate WebApp
+
+' ===== Engagement Event Emission =====
+note over APIGateway, ConferenceDataService
+Either APIGateway or ConferenceDataService emits EngagementEvent
+(e.g., contentItemViewed) asynchronously
+end note
+
+APIGateway --> EventBus: publishEvent(EngagementEvent)
+note right of EventBus
+contentItemViewed, userId, timestamp
+end note
+activate EventBus
+
+EventBus --> AnalyticsService: deliverEvent(EngagementEvent)
+activate AnalyticsService
+
+AnalyticsService -> AnalyticsService: recordEngagementEvent()
+deactivate AnalyticsService
+deactivate EventBus
+
+@enduml
