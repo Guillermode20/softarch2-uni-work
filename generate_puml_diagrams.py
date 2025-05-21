@@ -12,7 +12,8 @@ for dirpath, dirnames, filenames in os.walk(root_dir):
             puml_path = os.path.join(dirpath, filename)
             print(f"Generating diagram for {puml_path}")
             try:
-                # run plantuml to generate a png diagram from the .puml file
+                # run plantuml to generate a jpg diagram from the .puml file
+                print(f"Executing command: {' '.join(['plantuml', '-tpng', puml_path])}")
                 subprocess.run(['plantuml', '-tpng', puml_path], check=True)
             except subprocess.CalledProcessError as e:
                 # print an error message if diagram generation fails

@@ -7,7 +7,7 @@ skinparam DefaultFontName "Arial"
 skinparam DefaultFontSize 12
 skinparam shadowing false
 
-title Simplified User Note Creation Flow
+title User Note Creation Flow
 
 ' ===== Participants =====
 actor User <<Actor>>
